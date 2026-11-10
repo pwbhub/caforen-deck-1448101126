@@ -35,7 +35,7 @@
     if(loading)return;loading=true;$('liveRefresh').classList.add('is-busy');setStatus('Sinkron…');
     S.loadAll().then(function(r){
       rosters=r;updatedAt=new Date();
-      setStatus(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(updatedAt)+' WIB','Jadwal Google Sheets dimuat untuk '+Object.keys(r).join(' & ')+'. Sinkron otomatis setiap jam.');
+      setStatus(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(updatedAt)+' WIB','Jadwal Google Sheets dimuat untuk '+Object.keys(r).join(' & ')+'. Sinkron otomatis setiap 5 menit.');
       render();
     }).catch(function(err){
       setStatus(rosters?'Data lama':'Gagal',err.message+' · klik ↻ untuk mencoba lagi');
@@ -44,6 +44,8 @@
   }
   $('liveRefresh').addEventListener('click',function(e){e.currentTarget.blur();load()});
   $('liveTrack').addEventListener('click',function(e){var b=e.target.closest('[data-dept]');if(b&&root.CAShell)root.CAShell.navigate('shift',{dept:b.dataset.dept})});
-  load();setInterval(render,30000);setInterval(load,3600000);
+  load();setInterval(render,30000);setInterval(load,300000);
+  root.addEventListener('online',load);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
   root.CALive={summary:function(){return rosters?summary():null},updatedAt:function(){return updatedAt},onUpdate:function(fn){listeners.push(fn)},reload:load};
 })(window);

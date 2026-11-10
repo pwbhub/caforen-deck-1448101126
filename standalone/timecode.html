@@ -873,6 +873,7 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
     var nameCol=rows[heading].findIndex(function(v){return norm(v)===dept});
     var months={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     var match=/^([A-Z]{3})\s+(\d{2}|\d{4})$/i.exec(tab);if(!match)throw Error('Tab tidak dikenali');
+    if(months[match[1].toUpperCase()]===undefined)throw Error('Tab tidak dikenali');
     var month=months[match[1].toUpperCase()],year=Number(match[2])+(match[2].length===2?2000:0),dayCount=new Date(Date.UTC(year,month+1,0)).getUTCDate();
     var dateCols=null;
     for(var i=heading-1;i>=Math.max(0,heading-6);i--){
@@ -899,7 +900,7 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
       function finish(err,data){clearTimeout(timer);try{delete root[cb]}catch(_){root[cb]=undefined}script.remove();err?reject(err):resolve(data)}
       root[cb]=function(data){finish(null,data)};
       script.onerror=function(){finish(new Error('Tidak dapat mengakses Google Sheets'))};
-      script.src='https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx='+encodeURIComponent('responseHandler:'+cb)+'&sheet='+encodeURIComponent(tab)+'&t='+Date.now();
+      script.src='https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx='+encodeURIComponent('responseHandler:'+cb)+'&headers=0&sheet='+encodeURIComponent(tab)+'&t='+Date.now();
       document.head.appendChild(script);
     });
   }
@@ -949,10 +950,11 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
     });
     return best;
   }
-  /* Muat tab bulan berjalan + bulan sebelumnya untuk seluruh departemen. */
+  /* Termasuk bulan berikutnya saat besok sudah berganti bulan (Next Shift). */
   function loadAll(){
     var p=jakartaParts(),cur=monthTab(p.year,p.month),pv=addDays(p.year,p.month,1,-1),prev=monthTab(pv.y,pv.m);
-    return Promise.all([cur,prev].map(function(tab){
+    var next=addDays(p.year,p.month,p.day,1),tabs=Array.from(new Set([cur,prev,monthTab(next.y,next.m)]));
+    return Promise.all(tabs.map(function(tab){
       return jsonpSheet(tab).then(function(data){
         var rows=gvizRows(data),map={};
         DEPARTMENTS.forEach(function(d){try{map[d]=parseRows(rows,tab,d)}catch(_){}});
@@ -960,7 +962,7 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
       }).catch(function(){return [tab,null]});
     })).then(function(list){
       var rosters={},ok=0;list.forEach(function(x){if(x[1]){rosters[x[0]]=x[1];if(Object.keys(x[1]).length)ok++}});
-      if(!ok)throw Error('Jadwal belum dapat dimuat dari Google Sheets');
+      if(!ok||!rosters[cur]||!Object.keys(rosters[cur]).length)throw Error('Jadwal belum dapat dimuat dari Google Sheets untuk tab '+cur);
       return rosters;
     });
   }
@@ -1229,7 +1231,7 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
     if(loading)return;loading=true;$('liveRefresh').classList.add('is-busy');setStatus('Sinkron…');
     S.loadAll().then(function(r){
       rosters=r;updatedAt=new Date();
-      setStatus(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(updatedAt)+' WIB','Jadwal Google Sheets dimuat untuk '+Object.keys(r).join(' & ')+'. Sinkron otomatis setiap jam.');
+      setStatus(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(updatedAt)+' WIB','Jadwal Google Sheets dimuat untuk '+Object.keys(r).join(' & ')+'. Sinkron otomatis setiap 5 menit.');
       render();
     }).catch(function(err){
       setStatus(rosters?'Data lama':'Gagal',err.message+' · klik ↻ untuk mencoba lagi');
@@ -1238,7 +1240,9 @@ window.CA_WEATHER_ICONS={"clear-day": "<svg viewBox=\"0 0 128 128\" fill=\"none\
   }
   $('liveRefresh').addEventListener('click',function(e){e.currentTarget.blur();load()});
   $('liveTrack').addEventListener('click',function(e){var b=e.target.closest('[data-dept]');if(b&&root.CAShell)root.CAShell.navigate('shift',{dept:b.dataset.dept})});
-  load();setInterval(render,30000);setInterval(load,3600000);
+  load();setInterval(render,30000);setInterval(load,300000);
+  root.addEventListener('online',load);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
   root.CALive={summary:function(){return rosters?summary():null},updatedAt:function(){return updatedAt},onUpdate:function(fn){listeners.push(fn)},reload:load};
 })(window);
 
