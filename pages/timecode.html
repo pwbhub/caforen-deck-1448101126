@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id" data-route="timecode">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Timecode Decoder · Content Analyst Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<script src="../js/core/apply.js"></script>
+<script src="../js/core/embed.js"></script>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/pages/timecode.css">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+</head>
+<body>
+<div class="page page-wide">
+
+<header class="hero tc-hero">
+  <div class="hero-nav">
+    <div class="hero-brand"><div class="hero-logo">⏱</div><div class="hero-bt"><strong>TC SCANNER</strong><small>STUDIO · IMAGE TO SPREADSHEET</small></div></div>
+    <span class="hero-pill"><i class="pulse"></i>Privat · diproses di browser</span>
+  </div>
+  <div class="tc-hero-main">
+    <div class="tc-copy">
+      <div class="eyebrow">Image to spreadsheet</div>
+      <h1>Timecode <span>Decoder</span></h1>
+      <p class="hero-lead">Baca, periksa, dan salin timecode dari screenshot ke spreadsheet. OCR dijalankan 4 kali dengan prapemrosesan berbeda lalu dibandingkan agar angka meragukan mudah ditemukan.</p>
+      <div class="steps"><span><b>1</b>Unggah / tempel gambar</span><span><b>2</b>Periksa sel kuning</span><span><b>3</b>Salin ke Sheet</span></div>
+    </div>
+
+    <div class="decoder-art" aria-hidden="true">
+      <div class="decoder-panel">
+        <div class="decoder-top"><span class="decoder-live"><i></i> LIVE ANALYSIS</span><span class="decoder-chip">FRAME SYNC</span></div>
+        <div class="decoder-label">TIMECODE STREAM <span>HH : MM : SS : FF</span></div>
+        <div class="decoder-display"><span class="tc-segment" id="tcHH">00</span><i>:</i><span class="tc-segment" id="tcMM">00</span><i>:</i><span class="tc-segment" id="tcSS">00</span><i>:</i><span class="tc-segment" id="tcFF">00</span></div>
+        <div class="decoder-toast" id="toast" role="status" aria-live="polite"></div>
+        <div class="decoder-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="decoder-bottom"><span class="decoder-lock"><i></i> <span id="decoderState">IDLE · READY</span></span><span>FRAME <b id="frameNumber">00001</b></span></div>
+      </div>
+      <div class="decoder-float">✦ PIXEL BY PIXEL</div>
+    </div>
+  </div>
+</header>
+
+<main class="tc-work">
+  <section class="card tc-source">
+    <div class="card-head"><div><span class="card-kicker">Sumber</span><h2>Gambar timecode</h2></div><span class="chip">Ctrl+V didukung</span></div>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Pilih atau jatuhkan gambar">
+      <div class="ico">📥</div>
+      <strong>Drop gambar di sini</strong>
+      <div class="muted">atau klik untuk memilih file · bisa juga Ctrl+V untuk menempel screenshot</div>
+      <input type="file" id="file" accept="image/*" hidden>
+    </div>
+    <div class="flow" id="workflow" style="display:none" aria-label="Progres proses">
+      <div class="flow-top"><div><span class="flow-kicker">ALUR PEMROSESAN</span><strong id="workflowText">Menunggu gambar</strong></div><span class="flow-pct" id="workflowPercent">0%</span></div>
+      <div class="flow-track"><div class="flow-fill" id="workflowFill"></div></div>
+      <ol class="flow-steps workflow-steps" title="Klik tahap untuk melihat respons animasi decoder">
+        <li class="wf-step active" data-step="0"><span class="wf-dot">1</span><span>Unggah</span></li>
+        <li class="wf-step" data-step="1"><span class="wf-dot">2</span><span>OCR</span></li>
+        <li class="wf-step" data-step="2"><span class="wf-dot">3</span><span>Verifikasi</span></li>
+        <li class="wf-step" data-step="3"><span class="wf-dot">4</span><span>Siap salin</span></li>
+        <li class="wf-step" data-step="4"><span class="wf-dot">5</span><span>Selesai</span></li>
+      </ol>
+    </div>
+    <div id="previewWrap" class="preview-wrap"><img id="preview" alt="Pratinjau gambar yang diunggah"></div>
+    <div class="prog" id="prog"><div></div></div>
+    <div class="muted tc-status" id="status"></div>
+  </section>
+
+  <div class="tc-right">
+    <section class="card" id="result" style="display:none">
+      <div class="card-head tc-result-head">
+        <div><span class="card-kicker">Hasil</span><h2>Hasil Deteksi</h2><div class="chips" id="chips"></div></div>
+        <div class="acts">
+          <button class="btn review-waiting" id="confirmAll" type="button" title="Tandai semua hasil OCR sudah dicocokkan dengan gambar">Menunggu Pemeriksaan</button>
+          <button class="btn primary" id="copyAll" type="button">📋 Salin Semua</button>
+          <button class="btn" id="clear" type="button">↺ Reset</button>
+        </div>
+      </div>
+      <div class="tw"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      <div class="verify-note" id="verifyNote" role="status"></div>
+      <p class="muted tip">OCR tidak dapat menjamin 100% benar. Sel kuning berarti beberapa pembacaan berbeda: cocokkan dengan gambar, koreksi bila perlu, lalu <b>klik dua kali</b> sel untuk menandai sudah diperiksa. Format sel harus HH:MM:SS:FF. Penyalinan diblokir jika format salah atau sel meragukan belum diperiksa.</p>
+    </section>
+    <section class="card tc-empty" id="resultEmpty" aria-hidden="true">
+      <div class="tc-empty-art"><span>00</span><i>:</i><span>00</span><i>:</i><span>00</span><i>:</i><span>00</span></div>
+      <h3>Hasil akan muncul di sini</h3>
+      <p class="muted">Unggah screenshot daftar timecode (Source In, Source Out, Duration). Tabel hasil bisa diedit, diverifikasi, lalu disalin langsung ke Google Sheets / Excel.</p>
+      <ul class="tc-tips">
+        <li><b>Tips</b> crop area timecode saja agar OCR lebih akurat.</li>
+        <li><b>Salin kolom</b> tersedia di setiap judul kolom.</li>
+        <li><b>Format</b> sel disalin sebagai teks agar tidak berubah jadi jam.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<footer class="page-foot"><span><strong>TC SCANNER</strong> · OCR berjalan di browser Anda — gambar tidak diunggah ke server.</span><span>Mesin OCR: Tesseract.js (dimuat dari CDN saat pertama dipakai)</span></footer>
+</div>
+<script src="../js/pages/timecode.js"></script>
+</body>
+</html>

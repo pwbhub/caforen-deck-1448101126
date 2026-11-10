@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id" data-route="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Beranda · Content Analyst Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="../js/core/apply.js"></script>
+<script src="../js/core/embed.js"></script>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/pages/home.css">
+</head>
+<body>
+<div class="page">
+
+<header class="hero home-hero">
+  <div class="hero-nav">
+    <div class="hero-brand"><div class="hero-logo">⌂</div><div class="hero-bt"><strong>CONTENT ANALYST DRAFT</strong><small>WORKSPACE TERPADU</small></div></div>
+    <span class="hero-pill"><i class="pulse"></i><span id="greet">Selamat datang</span></span>
+  </div>
+  <div class="home-hero-main">
+    <div>
+      <div class="eyebrow">Satu pintu · enam menu</div>
+      <h1>Content Analyst <span>Draft</span></h1>
+      <p class="hero-lead">Semua alat kerja Content Analyst dalam satu workspace: jadwal shift realtime, pembaca timecode, editor hotspot, pembuat CSV clip insertion, dan penyusun laporan exposure PPTX. Header di atas selalu menempel — berita, cuaca, dan shift yang sedang berjalan di semua departemen tetap terlihat di menu mana pun.</p>
+      <div class="steps"><span><b>1</b>Pilih menu di header</span><span><b>2</b>Kerjakan di halaman</span><span><b>3</b>Data tetap tersimpan saat pindah menu</span></div>
+    </div>
+    <div class="home-stack" aria-hidden="true">
+      <div class="stack-card c1">◷ Shift Live</div>
+      <div class="stack-card c2">⏱ 00:12:34:05</div>
+      <div class="stack-card c3">✳ Hotspot</div>
+      <div class="stack-card c4">▦ CSV · W / R</div>
+      <div class="stack-card c5">▶ Scene Deck · PPTX</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><div><span class="kick">00 / SEKARANG</span><h2>Live di semua departemen</h2></div><p id="liveMeta">Memuat jadwal dari Google Sheets…</p></div>
+  <div class="live-grid" id="liveGrid">
+    <div class="live-card skeleton"></div><div class="live-card skeleton"></div><div class="live-card skeleton"></div><div class="live-card skeleton"></div>
+  </div>
+</section>
+
+<section id="newsSection">
+  <div class="sec-head"><div><span class="kick">01 / KABAR JAKARTA</span><h2>Feed berita terkini</h2></div><p>Rangkuman berita terbaru dari beberapa media melalui RSS publik — diurutkan dari yang paling baru, diperbarui otomatis setiap 10 menit.</p></div>
+  <div class="nf-toolbar">
+    <div class="nf-filters" id="nfFilters" role="group" aria-label="Filter sumber berita">
+      <button type="button" data-src="all" aria-pressed="true">Semua</button>
+    </div>
+    <div class="nf-tools">
+      <label class="nf-switch" title="Hanya berita yang menyebut Jakarta / Jabodetabek"><input type="checkbox" id="nfJakarta" checked><span class="nf-knob" aria-hidden="true"></span><span>Fokus Jakarta</span></label>
+      <span class="nf-status" id="nfStatus">Memuat feed…</span>
+      <button type="button" class="btn sm" id="nfRefresh" title="Muat ulang feed">↻ Muat ulang</button>
+    </div>
+  </div>
+  <div class="nf-grid" id="nfGrid" aria-live="polite">
+    <div class="nf-card nf-skel nf-feature"></div><div class="nf-card nf-skel"></div><div class="nf-card nf-skel"></div><div class="nf-card nf-skel"></div><div class="nf-card nf-skel"></div>
+  </div>
+  <div class="nf-more"><button type="button" class="btn" id="nfMore" hidden>Tampilkan lebih banyak ↓</button></div>
+  <p class="nf-note">Judul, gambar, dan ringkasan milik masing-masing media; klik kartu untuk membaca artikel lengkap di situs sumber (tab baru).</p>
+</section>
+
+<footer class="page-foot"><span><strong>CONTENT ANALYST DRAFT</strong> · Semua pemrosesan file berjalan lokal di browser.</span><span>Data jadwal: Google Sheets · Cuaca: Open-Meteo · Berita: RSS Detik, ANTARA, CNN Indonesia</span></footer>
+</div>
+<script src="../js/pages/home.js"></script>
+<script src="../js/pages/news-feed.js"></script>
+</body>
+</html>

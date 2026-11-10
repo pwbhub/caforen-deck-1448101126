@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id" data-route="scene">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Susun laporan brand exposure dari template PowerPoint, hitung durasi per scene, dan ekspor PPTX langsung di browser.">
+<title>Scene Deck — Exposure, tersusun.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="../js/core/apply.js"></script>
+<script src="../js/core/embed.js"></script>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/pages/scene-deck.css">
+<script src="../js/data/scene-deck-template.js"></script>
+<script src="../js/vendor/jszip.min.js"></script>
+<script src="../js/pages/scene-deck-engine.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#" data-tab="overview" aria-label="Scene Deck — Informasi utama"><span class="brandmark"><i></i><i></i><i></i></span><span class="brand-text">Scene <span>Deck</span></span></a>
+    <div class="workspace"><span class="workspace-icon">SD</span><div>Production workspace<small>Laporan brand exposure</small></div><span class="tiny-arrow">⌄</span></div>
+    <p class="nav-label">WORKSPACE</p>
+    <nav aria-label="Bagian laporan">
+      <button class="nav-item active" data-tab="overview"><span data-icon="layout"></span>Informasi utama<span class="nav-dot"></span></button>
+      <button class="nav-item" data-tab="scenes"><span data-icon="film"></span>Daftar scene<span id="navSceneCount" class="count">1</span></button>
+      <button class="nav-item" data-tab="summary"><span data-icon="chart"></span>Ringkasan exposure</button>
+    </nav>
+    <p class="nav-label tools-label">PERALATAN</p>
+    <nav>
+      <button class="nav-item" data-tab="template"><span data-icon="layers"></span>Template PPTX</button>
+      <button class="nav-item" data-tab="guide"><span data-icon="book"></span>Panduan penggunaan</button>
+    </nav>
+    <div class="sidebar-note"><span data-icon="shield"></span><strong>File tetap milik Anda.</strong><p>Input dan gambar pengganti diproses di browser. Tidak dikirim ke server.</p></div>
+    <div class="sidebar-bottom"><span class="avatar">CA</span><div>Content Analyst<small>Local workspace</small></div><span class="online-dot"></span></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div><button id="mobileMenu" class="icon-button mobile-only" aria-label="Buka navigasi"><span data-icon="menu"></span></button><span class="breadcrumb">Workspace <span>/</span> <b id="breadcrumbTitle">Informasi utama</b></span></div><div class="top-actions"><span class="draft-status" id="draftStatus"><span></span> Draft belum disimpan</span><button id="restartDeck" class="button button-quiet restart-btn" type="button" title="Kosongkan data dan susun PPT baru"><span data-icon="restart"></span>Mulai ulang</button><button id="saveDraft" class="button button-quiet"><span data-icon="save"></span>Simpan draft</button><button id="exportButton" class="button button-dark"><span data-icon="download"></span>Ekspor PPTX</button></div></header>
+    <main>
+      <div class="page-heading"><div><div class="eyebrow"><span></span> EXPOSURE REPORT BUILDER</div><h1 id="pageTitle">Exposure, tersusun.</h1><p id="pageDescription">Dari detail setiap scene menjadi laporan yang siap dipresentasikan.</p></div><div class="heading-meta"><span class="pill"><span data-icon="monitor"></span>16:9 · PowerPoint</span><small id="headingSlides">4 slide dalam laporan</small></div></div>
+      <section class="metrics-strip" aria-label="Ringkasan langsung"><div class="metric"><span>Total scene <i data-icon="film"></i></span><strong id="metricScenes">01</strong><small>scene tersedia</small></div><div class="metric"><span>Total exposure <i data-icon="clock"></i></span><strong id="metricTotal">0<em>detik</em></strong><small>Indoor + Outdoor</small></div><div class="metric"><span>Outdoor / Indoor <i data-icon="sun"></i></span><strong id="metricLocales">0 <b>/</b> 0<em>detik</em></strong><small>berdasarkan locale scene</small></div><div class="metric"><span>Key logo <i data-icon="key"></i></span><strong id="metricKey">0<em>detik</em></strong><small id="metricKeyCount">0 scene dengan key logo</small></div></section>
+      <div id="loadingState" class="loading-banner"><span class="spinner"></span>Menyiapkan template PowerPoint Anda…</div>
+      <section id="section-overview" class="tab-section active">
+        <!-- Baris 1: Informasi utama  ↔  pratinjau slide cover -->
+        <div class="editor-layout editor-row">
+          <div class="editor-main">
+            <div class="section-heading"><h2><span class="section-number">01</span>Informasi utama</h2><span class="section-tag">SLIDE COVER</span></div>
+            <div class="panel form-panel"><div class="panel-top"><div><h3>Identitas laporan</h3><p>Judul yang tampil di halaman pertama presentasi.</p></div><span data-icon="edit"></span></div><div class="field"><label for="titleInput">TITLE <span class="required">*</span></label><input id="titleInput" type="text" placeholder="Contoh: BRAND EXPOSURE REPORT" maxlength="160" autocomplete="off"><small>Judul utama pada slide cover.</small></div><div class="field"><label for="subtitleInput">SUBTITLE / NAMA FILE <span class="required">*</span></label><input id="subtitleInput" type="text" placeholder="Contoh: Nama Program — Episode 01" maxlength="160" autocomplete="off"><small>Otomatis menjadi SUBNAME di slide ringkasan dan nama file PPTX.</small></div><div class="filename-preview"><span data-icon="file"></span><span id="filenamePreview">Nama Program — Episode 01.pptx</span><b>.PPTX</b></div><div class="field cover-upload-field"><label>GAMBAR COVER</label><div id="coverUploadMount"></div></div></div>
+          </div>
+          <aside class="preview-column" aria-label="Pratinjau slide cover">
+            <div class="section-heading"><h2>Pratinjau slide</h2><span class="live-pill"><span></span>LIVE</span></div>
+            <div class="preview-card"><div id="coverPreview" class="slide-preview cover-preview"></div><div class="preview-footer"><span>01 <b>Cover laporan</b></span><span>16:9</span></div></div>
+            <div class="template-card"><div class="template-symbol" data-icon="layers"></div><div><span>TEMPLATE AKTIF</span><strong id="templateNameSide">PPT(NAME).pptx</strong><small>Cover · Ringkasan · Scene · Ending</small></div><button class="icon-button" data-tab="template" aria-label="Kelola template"><span data-icon="arrow"></span></button></div>
+            <div class="workflow-note"><span class="small-overline">SATU ALUR. TANPA HITUNG ULANG.</span><h3>Isi scene.<br>Biarkan angka bekerja.</h3><p>Exposure, jumlah scene, dan key logo diperbarui otomatis saat Anda mengubah data.</p><div class="workflow-line"><span>INPUT</span><i></i><span>HITUNG</span><i></i><span>PPTX</span></div></div>
+          </aside>
+        </div>
+        <!-- Baris 2: Detail program  ↔  pratinjau slide ringkasan -->
+        <div class="editor-layout editor-row row-detail">
+          <div class="editor-main">
+            <div class="section-heading"><h2><span class="section-number">02</span>Detail program</h2><span class="section-tag">SLIDE RINGKASAN</span></div>
+            <div class="panel form-panel"><div class="field-grid"><div class="field"><label for="showDuration">SHOW DURATION <span class="required">*</span></label><div class="input-with-icon"><span data-icon="clock"></span><input id="showDuration" class="timecode" type="text" value="00:24:00:00" placeholder="hh:mm:ss:ff" maxlength="11"></div><small id="showDurationHint">Format hh:mm:ss:ff · 25 fps</small></div><div class="field"><label for="episodeNumber">EPISODE NUMBER <span class="required">*</span></label><input id="episodeNumber" type="number" min="0" max="99" step="1" value="1"><small>Nomor episode, bilangan bulat 0–99.</small></div><div class="field"><label for="fpsInput">FRAME RATE</label><select id="fpsInput"><option value="25">25 fps</option><option value="24">24 fps</option><option value="30">30 fps</option><option value="50">50 fps</option><option value="60">60 fps</option></select><small>Menentukan validasi angka frame (ff).</small></div><div class="field"><label for="txDate">TX DATE <span class="optional">opsional</span></label><input id="txDate" type="date"><small>Kolom tambahan dari template asli.</small></div></div><div class="field"><label>GAMBAR RINGKASAN</label><div id="summaryUploadMount"></div></div></div>
+          </div>
+          <aside class="preview-column" aria-label="Pratinjau slide ringkasan">
+            <div class="section-heading"><h2>Pratinjau ringkasan</h2><span class="live-pill"><span></span>LIVE</span></div>
+            <div class="preview-card"><div id="summarySidePreview" class="slide-preview summary-preview"></div><div class="preview-footer"><span>02 <b>Ringkasan program</b></span><button type="button" class="preview-link" data-tab="summary" data-goto-slide="1" title="Buka di penampil Ringkasan exposure">Lihat semua slide ›</button></div></div>
+            <p class="preview-note"><span data-icon="info"></span>Pratinjau skematis. File ekspor memakai layout dan elemen template PPTX asli.</p>
+          </aside>
+        </div>
+        <!-- Baris 3: langkah berikutnya -->
+        <div class="row-next"><div class="next-step"><div><strong>Berikutnya: susun setiap scene</strong><p>Tambahkan breakdown durasi, locale, dan bukti visual.</p></div><button class="button button-coral" data-tab="scenes">Kelola scene <span data-icon="arrow"></span></button></div></div>
+      </section>
+      <section id="section-scenes" class="tab-section"><div class="section-heading scene-toolbar"><div><h2>Daftar scene <span id="sceneBadge" class="count">1</span></h2><p>Setiap scene menjadi satu slide. Penomoran dan total selalu mengikuti urutan.</p></div><button id="addScene" class="button button-coral"><span data-icon="plus"></span>Tambah scene</button></div><div id="sceneList"></div><div class="ending-notice"><span data-icon="check"></span>Slide ending asli otomatis ditempatkan setelah scene terakhir.</div></section>
+      <section id="section-summary" class="tab-section"><div class="section-heading"><h2>Ringkasan exposure</h2><span class="live-pill"><span></span>TERHITUNG OTOMATIS</span></div><div class="summary-layout"><div class="panel summary-panel"><h3 id="summaryName">Nama Program — Episode 01</h3><p>Nilai berikut akan mengisi kolom pada slide kedua.</p><div id="summaryRows"></div><div class="key-note"><span data-icon="info"></span><p><strong>Key logo adalah bagian dari total exposure.</strong> Nilainya menjumlahkan detik seluruh scene dengan Embed Type khusus <b>KEY LOGO</b> (pilihan terakhir di dropdown), bukan jumlah logo unik atau tambahan durasi. Bila tidak ada, tampil “-”.</p></div></div><div><div class="preview-card deck-viewer" id="deckViewer" tabindex="0" aria-label="Pratinjau seluruh slide PPT · gunakan panah kiri/kanan">
+  <div class="deck-head"><b>Pratinjau PPT</b><span class="deck-count" id="deckCount">1 / 4</span></div>
+  <div class="deck-stage">
+    <div id="deckSlide" class="slide-preview cover-preview" aria-live="polite"></div>
+    <button type="button" class="deck-nav prev" id="deckPrev" aria-label="Slide sebelumnya">‹</button>
+    <button type="button" class="deck-nav next" id="deckNext" aria-label="Slide berikutnya">›</button>
+  </div>
+  <div class="preview-footer"><span id="deckLabel">01 <b>Cover laporan</b></span><span>16:9 · ←/→</span></div>
+  <div class="deck-strip" id="deckStrip" role="tablist" aria-label="Daftar slide"></div>
+</div><div id="exposureSplit" class="split-card"></div></div></div></section>
+      <section id="section-template" class="tab-section"><div class="section-heading"><h2>Template PowerPoint</h2><span class="section-tag">FILE SUMBER</span></div><div class="panel template-panel"><div class="template-file-icon" data-icon="layers"></div><h3 id="templateNameMain">PPT(NAME).pptx</h3><p>Template sample Anda sudah tersedia. Ganti dengan template empat slide yang memiliki placeholder dan struktur yang sama.</p><label class="button button-dark file-button"><span data-icon="upload"></span>Unggah template PPTX<input id="templateUpload" type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"></label><button id="resetTemplate" class="button button-quiet">Gunakan sample asli</button><div id="templateDetails" class="template-details"></div></div><div class="template-steps"><div><b>01</b><h3>Cover</h3><p>TITLE, SUBTITLE, dan gambar kanan.</p></div><div><b>02</b><h3>Ringkasan</h3><p>SUBNAME, data program, dan total exposure.</p></div><div><b>03</b><h3>Scene master</h3><p>Diduplikasi sesuai daftar scene Anda.</p></div><div><b>04</b><h3>Ending</h3><p>Dipertahankan utuh, selalu di akhir.</p></div></div><div class="draft-tools panel"><div><h3>Lanjutkan pekerjaan sebelumnya</h3><p>Simpan draft JSON beserta template dan gambar, lalu impor kembali di browser mana pun.</p></div><label class="button button-outline file-button"><span data-icon="upload"></span>Impor draft<input id="draftUpload" type="file" accept=".json,application/json"></label></div></section>
+      <section id="section-guide" class="tab-section"><div class="section-heading"><h2>Dari input ke presentasi</h2><span class="section-tag">PANDUAN</span></div><div class="panel guide-panel"><article><span>01</span><div><h3>Mulai dengan template</h3><p>Sample asli telah dimuat. Anda dapat mengunggah template empat slide dengan penanda TITLE, SUBTITLE, SUBNAME, Scene, dan Breakdown Duration yang sama. Logo, tema, dan penutup tidak diubah.</p></div></article><article><span>02</span><div><h3>Lengkapi informasi utama</h3><p>Isi TITLE, SUBTITLE, durasi program, dan episode. SUBTITLE terhubung langsung ke SUBNAME serta nama file hasil. Gambar yang belum diganti tetap menggunakan gambar template.</p></div></article><article><span>03</span><div><h3>Masukkan breakdown per scene</h3><p>Tulis angka detik dipisahkan tanda +, misalnya 2+4+5+1+6+8+5. Hasilnya 31 detik. Angka desimal diperbolehkan; nilai negatif dan rumus selain penjumlahan ditolak. Isi Locale, Embed Type, dan TCR IN/OUT. Durasi exposure berasal dari breakdown, bukan selisih TCR.</p></div></article><article><span>04</span><div><h3>Periksa ringkasan, lalu ekspor</h3><p>Outdoor dan Indoor menjumlahkan scene berdasarkan Locale. Total exposure adalah Outdoor + Indoor. KEY LOGO menjumlahkan detik scene dengan Embed Type KEY LOGO. Jumlah slide akhir adalah jumlah scene + 3. Klik Ekspor PPTX untuk mengunduh file PowerPoint editable.</p></div></article><div class="guide-bottom"><h3>Catatan penting</h3><p>Format hh:mm:ss:ff divalidasi sesuai frame rate pilihan; tidak mengubah timecode otomatis. Gambar JPG, PNG, dan WebP sampai 15 MB didukung dan dimuat tanpa distorsi. Breakdown sangat panjang tetap disimpan dengan font yang menyesuaikan kotak template; cek keterbacaan di PowerPoint. Preview adalah gambaran, bukan render PowerPoint identik. Untuk menjaga data lintas sesi, unduh Simpan draft; aplikasi tidak menyimpan unggahan pengganti di server.</p></div></div></section>
+      <footer class="page-footer"><span>SCENE DECK <i>/</i> Dibuat untuk detail yang berarti.</span><span>Template asli. Angka otomatis. PPTX editable.</span></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="restartDialog"><form method="dialog" class="export-dialog restart-dialog"><span class="export-icon restart-icon" data-icon="restart"></span><h2>Mulai PPT baru?</h2><p>Semua isian (judul, detail program, daftar scene, dan gambar pengganti) akan dikosongkan. Template PPTX yang sedang aktif tetap dipakai.</p><p class="restart-tip">Ingin menyimpan pekerjaan ini dulu? Pilih <b>Simpan draft</b> sebelum mulai ulang.</p><div class="restart-actions"><button value="cancel" class="button button-quiet" type="submit">Batal</button><button value="draft" class="button button-quiet" type="submit">Simpan draft dulu</button><button value="confirm" class="button button-coral" type="submit" id="restartConfirm">Ya, mulai ulang</button></div></form></dialog>
+<dialog id="exportDialog"><div class="export-dialog"><span class="export-icon" data-icon="download"></span><h2>Menyusun presentasi Anda</h2><p>Memperbarui data, gambar, dan urutan scene pada template asli.</p><div class="progress-track"><div id="exportProgress"></div></div><span id="exportProgressLabel">Menyiapkan file…</span></div></dialog>
+<script src="../js/pages/scene-deck-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+/* ==========================================================================
+   saver.css — screensaver beranimasi untuk setiap state:
+     gate   (halaman login)    → aksen lime
+     user   (User idle)        → aksen mint
+     admin  (Admin idle)       → aksen koral
+     locked (sesi terkunci)    → aksen merah + gembok & garis pindai
+   Mode animasi diatur Admin: data-anim = full | soft | off.
+   ========================================================================== */
+.saver{--sv:var(--g);--sv2:var(--yel);--sv3:var(--blu)}
+.saver[data-state=user]{--sv:var(--mint);--sv2:var(--yel);--sv3:var(--violet)}
+.saver[data-state=admin]{--sv:var(--red);--sv2:var(--orange);--sv3:var(--yel)}
+.saver[data-state=locked]{--sv:#FF4D3D;--sv2:var(--orange);--sv3:var(--pink)}
+.saver .saver-title .st-2{color:var(--sv)}
+.saver .saver-shape.s1{background:var(--sv)}
+.saver .saver-shape.s3{background:var(--sv3)}
+.saver .saver-draft{background:var(--sv2)}
+
+/* latar bernapas */
+.saver::before{content:"";position:absolute;inset:-20%;z-index:-3;background:radial-gradient(40% 40% at 30% 30%,color-mix(in srgb,var(--sv) 22%,transparent),transparent 70%),radial-gradient(35% 35% at 75% 70%,color-mix(in srgb,var(--sv3) 20%,transparent),transparent 70%);animation:svBreath 12s ease-in-out infinite alternate}
+@keyframes svBreath{from{transform:translate(-3%,-2%) scale(1)}to{transform:translate(3%,2%) scale(1.12)}}
+
+/* partikel naik */
+.saver-orbs{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.saver-orbs i{position:absolute;bottom:-40px;width:var(--s,14px);height:var(--s,14px);border:2px solid #F6F3E2;border-radius:var(--rad,50%);background:var(--c,var(--sv));opacity:.85;animation:svRise var(--d,14s) linear infinite;animation-delay:var(--dl,0s)}
+.saver-orbs i:nth-child(1){left:4%;--s:12px;--d:13s;--dl:-2s}
+.saver-orbs i:nth-child(2){left:11%;--s:20px;--d:17s;--dl:-9s;--c:var(--sv2);--rad:5px}
+.saver-orbs i:nth-child(3){left:19%;--s:10px;--d:11s;--dl:-5s;--c:var(--sv3)}
+.saver-orbs i:nth-child(4){left:27%;--s:16px;--d:19s;--dl:-13s;--rad:4px}
+.saver-orbs i:nth-child(5){left:35%;--s:9px;--d:12s;--dl:-1s;--c:var(--pink)}
+.saver-orbs i:nth-child(6){left:44%;--s:22px;--d:21s;--dl:-7s;--c:var(--sv2)}
+.saver-orbs i:nth-child(7){left:52%;--s:11px;--d:14s;--dl:-11s;--c:var(--sv3);--rad:3px}
+.saver-orbs i:nth-child(8){left:60%;--s:15px;--d:16s;--dl:-4s}
+.saver-orbs i:nth-child(9){left:68%;--s:9px;--d:10s;--dl:-8s;--c:var(--orange)}
+.saver-orbs i:nth-child(10){left:75%;--s:19px;--d:18s;--dl:-15s;--c:var(--sv2);--rad:6px}
+.saver-orbs i:nth-child(11){left:82%;--s:12px;--d:13s;--dl:-6s;--c:var(--sv3)}
+.saver-orbs i:nth-child(12){left:89%;--s:17px;--d:20s;--dl:-12s}
+.saver-orbs i:nth-child(13){left:95%;--s:10px;--d:12s;--dl:-3s;--c:var(--pink);--rad:3px}
+.saver-orbs i:nth-child(14){left:48%;--s:13px;--d:15s;--dl:-10s;--c:var(--mint)}
+@keyframes svRise{0%{transform:translateY(0) rotate(0);opacity:0}8%{opacity:.85}85%{opacity:.85}100%{transform:translateY(-115vh) rotate(540deg);opacity:0}}
+
+/* cincin berdenyut di belakang judul */
+.saver-ring{position:absolute;left:50%;top:50%;z-index:-1;width:min(70vw,720px);aspect-ratio:1;border:3px dashed color-mix(in srgb,var(--sv) 55%,transparent);border-radius:50%;translate:-50% -50%;animation:svSpin 60s linear infinite;pointer-events:none}
+.saver-ring.r2{width:min(52vw,520px);border-style:dotted;border-color:color-mix(in srgb,var(--sv3) 55%,transparent);animation-duration:40s;animation-direction:reverse}
+@keyframes svSpin{to{rotate:360deg}}
+
+/* lencana memantul (gaya DVD) menampilkan state */
+.saver-float{position:absolute;inset:4vh 4vw;z-index:-1;pointer-events:none;animation:svX 17s linear infinite alternate}
+.saver-bounce{position:absolute;top:0;left:0;display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border:3px solid #F6F3E2;border-radius:99px;background:var(--sv);color:var(--k);box-shadow:5px 5px 0 rgba(246,243,226,.35);animation:svY 11s linear infinite alternate}
+.saver-bounce i{display:grid;place-items:center;width:30px;height:30px;border:2px solid var(--k);border-radius:50%;background:var(--k);color:var(--sv);font-style:normal;font-size:.95rem}
+.saver-bounce b{font:700 .78rem/1 var(--ff);letter-spacing:.16em}
+@keyframes svX{from{transform:translateX(0)}to{transform:translateX(calc(92vw - 190px))}}
+@keyframes svY{from{transform:translateY(0)}to{transform:translateY(calc(92vh - 60px))}}
+
+/* jam besar */
+.saver-bigclock{display:flex;align-items:baseline;justify-content:center;gap:.08em;margin-bottom:6px;font:700 clamp(2.2rem,6vw,4.2rem)/1 var(--fm);font-variant-numeric:tabular-nums;color:#F6F3E2;text-shadow:4px 4px 0 color-mix(in srgb,var(--sv) 60%,transparent)}
+.saver-bigclock i{font-style:normal;color:var(--sv);animation:svBlink 1s steps(1) infinite}
+.saver-bigclock small{margin-left:.25em;font-size:.38em;color:var(--sv2)}
+@keyframes svBlink{50%{opacity:.15}}
+
+/* huruf judul bergelombang */
+.saver-title .sv-ch{display:inline-block;animation:svWave 2.8s ease-in-out infinite;animation-delay:calc(var(--i) * 90ms)}
+@keyframes svWave{0%,60%,100%{transform:translateY(0)}20%{transform:translateY(-.14em) rotate(-3deg)}40%{transform:translateY(.04em)}}
+
+/* muncul bertahap saat screensaver tampil */
+.saver.show .saver-body>*{animation:svIn .7s var(--spring) both}
+.saver.show .saver-body>*:nth-child(2){animation-delay:.08s}
+.saver.show .saver-body>*:nth-child(3){animation-delay:.16s}
+.saver.show .saver-body>*:nth-child(4){animation-delay:.24s}
+.saver.show .saver-body>*:nth-child(n+5){animation-delay:.32s}
+@keyframes svIn{from{opacity:0;transform:translateY(30px) scale(.94)}to{opacity:1;transform:none}}
+.saver.show .saver-body .saver-title{animation:svIn .7s var(--spring) .16s both}
+
+/* timer sign out melingkar */
+.saver-timer{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}
+.saver-timer[hidden]{display:none}
+.saver-timer svg{width:40px;height:40px;rotate:-90deg}
+.saver-timer circle{fill:none;stroke-width:5}
+.saver-timer .st-bg{stroke:rgba(246,243,226,.18)}
+.saver-timer .st-fg{stroke:var(--sv2);stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear}
+.saver-timer .saver-count{margin:0}
+
+/* state terkunci: garis pindai + gembok bergoyang */
+.saver-scan{position:absolute;left:0;right:0;top:-10%;z-index:-1;height:18vh;background:linear-gradient(transparent,color-mix(in srgb,var(--sv) 18%,transparent),transparent);opacity:0;pointer-events:none}
+.saver[data-state=locked] .saver-scan{opacity:1;animation:svScan 4.5s ease-in-out infinite}
+@keyframes svScan{0%{top:-20%}100%{top:105%}}
+.saver[data-state=locked] .saver-bounce i{animation:svLock 1.8s ease-in-out infinite}
+@keyframes svLock{0%,70%,100%{rotate:0deg}78%{rotate:-18deg}86%{rotate:14deg}94%{rotate:-6deg}}
+.saver[data-state=locked] .saver-unlock{animation:svIn .6s var(--spring) .3s both}
+
+/* state login: logo berdenyut */
+.saver[data-state=gate] .saver-bounce{animation-duration:9s}
+.saver[data-state=admin] .saver-shape.s2{background:var(--sv2)}
+
+/* mode animasi */
+.saver[data-anim=soft] .saver-orbs i:nth-child(n+8),.saver[data-anim=soft] .saver-ring.r2{display:none}
+.saver[data-anim=soft] .saver-float,.saver[data-anim=soft] .saver-bounce,.saver[data-anim=soft] .saver-orbs i,.saver[data-anim=soft] .saver-ring{animation-duration:calc(var(--d,30s) * 2)}
+.saver[data-anim=soft] .saver-title .sv-ch{animation:none}
+.saver[data-anim=off] .saver-orbs,.saver[data-anim=off] .saver-ring,.saver[data-anim=off] .saver-scan,.saver[data-anim=off] .saver-float{display:none}
+.saver[data-anim=off] *,.saver[data-anim=off]::before{animation:none!important}
+
+/* Admin meminta animasi tetap jalan: pada perangkat "kurangi gerakan" animasi dibuat pelan, tidak dimatikan */
+@media(prefers-reduced-motion:reduce){
+  .saver:not([data-anim=off]) .saver-orbs i,.saver:not([data-anim=off]) .saver-ring,.saver:not([data-anim=off]) .saver-float,.saver:not([data-anim=off]) .saver-bounce,.saver:not([data-anim=off]) .saver-grid,.saver:not([data-anim=off]) .saver-shape,.saver:not([data-anim=off]) .saver-bigclock i,.saver:not([data-anim=off])::before,.saver:not([data-anim=off]) .saver-loader i{animation-duration:40s!important;animation-iteration-count:infinite!important}
+}
+@media(max-width:620px){.saver-bounce b{display:none}.saver-bounce{padding:6px}@keyframes svX{from{transform:translateX(0)}to{transform:translateX(calc(92vw - 60px))}}}

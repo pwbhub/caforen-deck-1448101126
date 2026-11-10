@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="id" data-route="hotspot">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hotspot Studio · Content Analyst Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="../js/core/apply.js"></script>
+<script src="../js/core/embed.js"></script>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/pages/hotspot.css">
+</head>
+<body>
+<div class="page page-wide">
+
+<header class="hero hs-hero" id="top">
+  <div class="hero-nav">
+    <div class="hero-brand"><div class="hero-logo">✳</div><div class="hero-bt"><strong>HOTSPOT STUDIO</strong><small>VISUAL PLACEMENT</small></div></div>
+    <span class="hero-pill"><i class="pulse"></i>Privat · diproses di browser</span>
+  </div>
+  <div class="hs-hero-main">
+    <div class="hs-copy">
+      <div class="eyebrow">Image to placement</div>
+      <h1>Hotspot <span>Editor</span></h1>
+      <p class="hero-lead">Unggah gambar, pindai adegan secara lokal, lalu sesuaikan posisi hotspot langsung di atas kanvas. Hasil disimpan sebagai JPG.</p>
+      <div class="steps"><span><b>1</b>Unggah gambar</span><span><b>2</b>Pindai adegan</span><span><b>3</b>Atur hotspot</span></div>
+    </div>
+    <div class="hero-visual" aria-label="Animasi alur kerja">
+      <div class="flow-viz" id="flowViz" data-state="idle">
+        <div class="flow-caption">Alur analisis visual</div><div class="flow-status" id="flowStatus">MODE SIAGA</div>
+        <svg class="flow-lines" viewBox="0 0 500 260" preserveAspectRatio="none" aria-hidden="true"><path class="flow-line" d="M110 130 C165 130 165 130 250 130 S340 130 390 130"/><path class="flow-pulse" d="M110 130 C165 130 165 130 250 130 S340 130 390 130"/></svg>
+        <div class="flow-node n1"><svg viewBox="0 0 32 32"><rect x="5" y="7" width="22" height="18" rx="3"/><circle cx="12" cy="13" r="2"/><path d="m7 22 7-6 4 4 3-3 5 5"/></svg><small>Gambar</small></div>
+        <div class="flow-node n2"><svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="8"/><path d="m20 20 7 7M11 14l2 2 4-5"/></svg><small>Analisis</small></div>
+        <div class="flow-node n3"><svg viewBox="0 0 32 32"><path d="M6 7h20v16H6zM12 27h8M16 23v4"/><path d="M10 18v-4M15 18V10M20 18v-6M25 18v-2"/></svg><small>Hotspot</small></div>
+        <div class="flow-stage" id="flowStage">Menunggu gambar untuk memulai alur</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="flow hs-flow" aria-label="Progres alur kerja">
+  <div class="flow-top"><div><span class="flow-kicker">ALUR KERJA</span><strong id="workflowStatus">Mulai dengan memilih gambar.</strong></div><span class="flow-pct" id="workflowCount">0 / 5 langkah</span></div>
+  <div class="flow-track"><div class="flow-fill" id="workflowFill"></div></div>
+  <ol class="flow-steps" id="workflowSteps">
+    <li class="wf-step active" data-target="sourcePanel"><span class="wf-dot">1</span><span>Unggah</span></li>
+    <li class="wf-step" data-target="scan"><span class="wf-dot">2</span><span>Pindai</span></li>
+    <li class="wf-step" data-target="ws"><span class="wf-dot">3</span><span>Tempatkan</span></li>
+    <li class="wf-step" data-target="adjust"><span class="wf-dot">4</span><span>Sesuaikan</span></li>
+    <li class="wf-step" data-target="ws"><span class="wf-dot">5</span><span>Simpan</span></li>
+  </ol>
+</div>
+
+<main class="hs-work">
+  <aside class="hs-side">
+    <section class="card" id="sourcePanel">
+      <div class="card-head"><div><span class="card-kicker">Sumber</span><h2>Gambar Anda</h2></div></div>
+      <div class="drop" id="dz" tabindex="0" role="button" aria-label="Pilih atau jatuhkan gambar">
+        <div class="ico">📥</div>
+        <strong>Tarik gambar ke sini</strong>
+        <div class="muted">atau klik untuk memilih dari perangkat<br>JPG, PNG, WEBP · Ctrl+V untuk menempel</div>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+    </section>
+
+    <section class="card" id="scan">
+      <div class="card-head"><div><span class="card-kicker">Analisis adegan</span><h2>Pindai cerdas</h2></div></div>
+      <p class="muted">Pelacakan lokal membaca gradasi warna dan komposisi untuk menyarankan hotspot yang sesuai. Gambar tetap diproses di browser.</p>
+      <button class="btn primary block hs-scan-btn" id="smart" disabled type="button">✳ Lacak gradasi &amp; sarankan hotspot</button>
+      <div class="scan-progress" id="scanProgress" aria-live="polite">
+        <div class="scan-progress-top"><span id="scanStage">Menyiapkan pemindaian…</span><span id="scanPercent">0%</span></div>
+        <div class="scan-track"><div class="scan-fill" id="scanFill"></div></div>
+        <small class="scan-note" id="scanNote">Menganalisis perubahan warna dan area visual.</small>
+      </div>
+      <div class="scene-result" id="sceneResult">
+        <strong id="sceneTitle">Menunggu gambar</strong>
+        <small id="sceneDetail">Unggah gambar untuk memulai analisis cerdas.</small>
+      </div>
+    </section>
+
+    <section class="card" id="adjust" style="display:none">
+      <div class="card-head"><div><span class="card-kicker">Hasil pemindaian</span><h2>Kontrol hotspot</h2></div></div>
+      <p class="muted">Atur tampilan hotspot hasil pelacakan, atau terima saran yang muncul di kanvas.</p>
+      <div class="tuning">
+        <div class="field"><label for="O">Opasitas <span class="val" id="vO"></span></label><input type="range" id="O" min="5" max="100" value="55"></div>
+        <div class="field"><label for="sizeRange">Skala ukuran <span class="val" id="sizeValue">100%</span></label><input type="range" id="sizeRange" min="25" max="250" step="5" value="100" disabled></div>
+        <div class="field full"><label for="col">Warna hotspot</label><input type="color" id="col" value="#25c922"></div>
+        <!-- input tersembunyi yang dibutuhkan logika asli -->
+        <input type="hidden" id="T" value="165"><input type="hidden" id="S" value="16"><input type="hidden" id="C" value="5">
+        <input type="hidden" id="A" value="8"><input type="hidden" id="F" value="60"><input type="hidden" id="X" value="14">
+        <input type="hidden" id="P" value="22"><input type="hidden" id="shape" value="quad">
+        <input type="checkbox" id="sub" checked hidden><input type="checkbox" id="orig" hidden>
+      </div>
+      <div class="hs-actions">
+        <button class="btn sm alt" id="acc" disabled type="button">Terima saran</button>
+        <button class="btn sm" id="resetRec" disabled type="button">Reset saran</button>
+        <button class="btn sm danger" id="clear" disabled type="button">Bersihkan</button>
+      </div>
+    </section>
+  </aside>
+
+  <section class="card hs-canvas">
+    <div class="card-head">
+      <div><span class="card-kicker">Ruang kerja</span><h2>Atur penempatan</h2><p class="muted" id="found">Unggah gambar lalu jalankan Pindai cerdas.</p></div>
+      <div class="hs-top-actions">
+        <button class="btn" id="resetApp" disabled type="button">↺ Ganti gambar</button>
+        <button class="btn primary" id="save" disabled type="button">↓ Simpan JPG</button>
+      </div>
+    </div>
+    <div class="stage editor-stage" id="ws">
+      <div class="empty">
+        <span class="empty-art">✳</span>
+        <b>Kanvas Anda masih kosong</b>
+        <small>Silakan unggah gambar di panel sumber terlebih dahulu.</small>
+      </div>
+      <canvas id="edit" style="display:none"></canvas>
+      <canvas id="out" style="display:none"></canvas>
+    </div>
+    <div class="canvas-legend">
+      <span><i class="legend-rec"></i> Saran cerdas</span>
+      <span><i class="legend-hot"></i> Hotspot aktif</span>
+      <span class="legend-help">Klik saran untuk menerima · seret area kosong untuk menggambar · <kbd>Delete</kbd> hapus pilihan</span>
+    </div>
+  </section>
+</main>
+
+<footer class="page-foot"><span><strong>HOTSPOT STUDIO</strong> · Saran adalah kandidat berbasis warna &amp; komposisi, bukan deteksi objek pasti.</span><span>Gambar tidak pernah dikirim ke server.</span></footer>
+</div>
+<script src="../js/pages/hotspot.js"></script>
+</body>
+</html>

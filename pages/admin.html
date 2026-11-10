@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="id" data-route="admin">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Konsol Admin · Content Analyst Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="../js/core/apply.js"></script>
+<script src="../js/core/embed.js"></script>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/pages/admin.css">
+</head>
+<body>
+<div class="page page-wide adm">
+
+<header class="hero adm-hero">
+  <div class="hero-nav">
+    <div class="hero-brand"><div class="hero-logo">⚙</div><div class="hero-bt"><strong>KONSOL ADMIN</strong><small>CONTENT ANALYST · KONTROL TAMPILAN</small></div></div>
+    <span class="hero-pill"><i class="pulse"></i><span id="admSession">Sesi Admin aktif</span></span>
+  </div>
+  <div class="adm-hero-main">
+    <div>
+      <div class="eyebrow">Ubah sekali · tampil di semua User</div>
+      <h1>Atur <span>Workspace</span></h1>
+      <p class="hero-lead">Ganti nama menu &amp; elemen, warna, teks login dan screensaver, skrip &amp; CSS baru, serta pengaturan CSV Maker. Semua perubahan tampil di preview sebelum disimpan, lalu langsung diterapkan ke tampilan User.</p>
+    </div>
+    <div class="adm-stats" id="admStats"></div>
+  </div>
+</header>
+
+<div class="adm-savebar" id="saveBar" data-dirty="false">
+  <span class="sb-state"><i></i><b id="sbText">Semua perubahan tersimpan</b><small id="sbMeta"></small></span>
+  <span class="sb-actions">
+    <button type="button" class="btn sm" id="btnDiscard" disabled>↺ Batalkan</button>
+    <button type="button" class="btn sm primary" id="btnSave" disabled>✓ Simpan &amp; terapkan</button>
+  </span>
+</div>
+
+<div class="adm-layout">
+  <nav class="adm-nav" id="admNav" aria-label="Bagian konsol">
+    <button type="button" data-sec="overview" aria-current="true"><i>◎</i>Ringkasan</button>
+    <button type="button" data-sec="insights"><i>✦</i>Data &amp; Rekomendasi</button>
+    <button type="button" data-sec="identity"><i>✎</i>Identitas &amp; Teks</button>
+    <button type="button" data-sec="menu"><i>☰</i>Menu</button>
+    <button type="button" data-sec="colors"><i>◐</i>Warna &amp; Font</button>
+    <button type="button" data-sec="elements"><i>⌖</i>Nama Elemen</button>
+    <button type="button" data-sec="code"><i>{}</i>Script &amp; CSS</button>
+    <button type="button" data-sec="csv"><i>▦</i>CSV Maker</button>
+    <button type="button" data-sec="scene"><i>▶</i>Scene Deck</button>
+    <button type="button" data-sec="security"><i>⚿</i>Sesi &amp; Keamanan</button>
+    <button type="button" data-sec="logs"><i>≣</i>Log Aktivitas</button>
+    <button type="button" data-sec="backup"><i>⇅</i>Cadangan &amp; Rilis</button>
+  </nav>
+
+  <main class="adm-main">
+
+    <!-- RINGKASAN -->
+    <section class="adm-sec" data-sec="overview">
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Mulai di sini</span><h2>Ringkasan</h2></div></div>
+        <div class="ov-grid" id="ovGrid"></div>
+        <div class="ov-actions">
+          <button type="button" class="btn sm" id="btnLockNow">🔒 Kunci sekarang (Alt+L)</button>
+          <button type="button" class="btn sm" id="btnReloadPages">⟳ Muat ulang semua halaman</button>
+          <button type="button" class="btn sm" data-jump="backup">⇅ Rilis ke komputer lain</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Alur kerja</span><h2>Cara kerja Admin → User</h2></div></div>
+        <ol class="howto">
+          <li><b>Ubah</b> apa saja di bagian kiri. Preview di kanan langsung berubah (draft).</li>
+          <li><b>Simpan &amp; terapkan</b> — perubahan aktif di browser ini untuk semua sesi User.</li>
+          <li><b>Rilis</b> — di <em>Cadangan &amp; Rilis</em>, unduh <code>site-config.js</code> lalu timpa <code>js/data/site-config.js</code> agar komputer lain ikut berubah.</li>
+          <li>Setiap simpan membuat <b>versi cadangan</b> yang bisa dipulihkan (15 versi terakhir).</li>
+        </ol>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Rekomendasi</span><h2>Fungsi pendukung alur program</h2></div><span class="row-gap"><span class="chip">✓ = sudah aktif</span><button type="button" class="btn sm primary" data-jump="insights">✦ Rekomendasi lanjutan per menu</button></span></div>
+        <ul class="recs" id="recs"></ul>
+      </div>
+    </section>
+
+
+    <!-- DATA & REKOMENDASI -->
+    <section class="adm-sec" data-sec="insights" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Dicatat otomatis di browser ini</span><h2>Data penggunaan menu</h2></div>
+          <span class="row-gap"><select id="usageRole" aria-label="Peran"><option value="">Semua peran</option><option value="user">User</option><option value="admin">Admin</option></select><button type="button" class="btn sm" id="btnUsageRefresh">⟳</button><button type="button" class="btn sm" id="btnUsageCsv">⬇ CSV</button><button type="button" class="btn sm danger" id="btnUsageReset">Reset data</button></span></div>
+        <div class="usage-grid">
+          <div><h3 class="mini-h">Dibuka &amp; waktu pakai per menu</h3><div class="ubars" id="usageBars"></div></div>
+          <div><h3 class="mini-h">14 hari terakhir</h3><div class="uspark" id="usageDays"></div><h3 class="mini-h" style="margin-top:14px">Hasil kerja (ekspor/salin)</h3><div class="uevents" id="usageEvents"></div></div>
+        </div>
+        <p class="muted small" id="usageSince"></p>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Dihitung dari data di atas</span><h2>Saran adaptif</h2></div><span class="chip">Klik untuk menerapkan ke draft</span></div>
+        <ul class="insights" id="insightList"></ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Pengolahan data tingkat lanjut</span><h2>Rekomendasi fungsi per menu</h2></div>
+          <span class="row-gap"><button type="button" class="btn sm" id="btnRoadmapCsv">⬇ Ekspor roadmap</button></span></div>
+        <div class="rm-filter" id="rmFilter" role="tablist" aria-label="Filter menu"></div>
+        <div class="rm-sum" id="rmSum"></div>
+        <div class="rm-list" id="rmList"></div>
+      </div>
+    </section>
+
+    <!-- IDENTITAS -->
+    <section class="adm-sec" data-sec="identity" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Header &amp; tab browser</span><h2>Identitas</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-brand-name">Nama aplikasi</label><input id="f-brand-name" data-path="brand.name" maxlength="40"></div>
+          <div class="field"><label for="f-brand-kicker">Teks kecil di atas nama</label><input id="f-brand-kicker" data-path="brand.kicker" maxlength="40"></div>
+          <div class="field"><label for="f-brand-logo">Ikon logo (1–2 karakter / emoji)</label><input id="f-brand-logo" data-path="brand.logo" maxlength="4"></div>
+          <div class="field"><label for="f-brand-doc">Judul tab browser</label><input id="f-brand-doc" data-path="brand.docTitle" maxlength="60"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Halaman masuk</span><h2>Teks login</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-login-title">Judul</label><input id="f-login-title" data-path="login.title" maxlength="60"></div>
+          <div class="field"><label for="f-login-foot">Catatan kaki</label><input id="f-login-foot" data-path="login.footer" maxlength="120"></div>
+          <div class="field span2"><label for="f-login-sub">Deskripsi</label><textarea id="f-login-sub" data-path="login.subtitle" rows="2" maxlength="300"></textarea></div>
+          <div class="field"><label for="f-login-ul">Label form User</label><input id="f-login-ul" data-path="login.userLabel" maxlength="40"></div>
+          <div class="field"><label for="f-login-al">Label form Admin</label><input id="f-login-al" data-path="login.adminLabel" maxlength="40"></div>
+          <div class="field span2"><label for="f-login-uh">Petunjuk User</label><input id="f-login-uh" data-path="login.userHint" maxlength="200"></div>
+          <div class="field span2"><label for="f-login-ah">Petunjuk Admin</label><input id="f-login-ah" data-path="login.adminHint" maxlength="200"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Saat tidak ada aktivitas</span><h2>Screensaver</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-sv-k">Teks kecil</label><input id="f-sv-k" data-path="saver.kicker" maxlength="50"></div>
+          <div class="field"><label for="f-sv-b">Badge (kosong = sembunyikan)</label><input id="f-sv-b" data-path="saver.badge" maxlength="14"></div>
+          <div class="field"><label for="f-sv-1">Judul bagian 1</label><input id="f-sv-1" data-path="saver.t1" maxlength="20"></div>
+          <div class="field"><label for="f-sv-2">Judul bagian 2 (warna aksen)</label><input id="f-sv-2" data-path="saver.t2" maxlength="20"></div>
+          <div class="field span2"><label for="f-sv-m">Pesan</label><input id="f-sv-m" data-path="saver.msg" maxlength="140"></div>
+          <div class="field"><label for="f-sv-anim">Animasi</label><select id="f-sv-anim" data-path="saver.anim"><option value="full">Penuh — partikel, lencana memantul, judul bergelombang</option><option value="soft">Lembut — gerakan pelan &amp; lebih sedikit</option><option value="off">Statis — tanpa animasi</option></select></div>
+          <div class="field"><span class="label">Coba</span><button type="button" class="btn sm" id="btnSaverDemo">▶ Tampilkan screensaver sekarang</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Untuk semua User</span><h2>Pengumuman</h2></div><label class="switch"><input type="checkbox" data-path="announcement.enabled"><span></span>Tampilkan</label></div>
+        <div class="fgrid">
+          <div class="field span2"><label for="f-an-t">Isi pengumuman (muncul di bawah header)</label><input id="f-an-t" data-path="announcement.text" maxlength="240" placeholder="mis. Rapat evaluasi pukul 15.00 di ruang 2"></div>
+          <div class="field"><label for="f-an-tone">Warna</label><select id="f-an-tone" data-path="announcement.tone"><option value="info">Info (kuning)</option><option value="warn">Perhatian (jingga)</option><option value="danger">Penting (koral)</option><option value="ok">Kabar baik (mint)</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Header</span><h2>Tautan &amp; strip</h2></div></div>
+        <div class="fgrid">
+          <label class="switch"><input type="checkbox" data-path="links.showCreator"><span></span>Tombol Creator</label>
+          <label class="switch"><input type="checkbox" data-path="links.showDonate"><span></span>Tombol Donate</label>
+          <div class="field"><label for="f-l-cl">Label Creator</label><input id="f-l-cl" data-path="links.creatorLabel" maxlength="20"></div>
+          <div class="field"><label for="f-l-cu">URL Creator</label><input id="f-l-cu" data-path="links.creatorUrl" maxlength="400"></div>
+          <div class="field"><label for="f-l-dl">Label Donate</label><input id="f-l-dl" data-path="links.donateLabel" maxlength="20"></div>
+          <div class="field"><label for="f-l-du">URL Donate</label><input id="f-l-du" data-path="links.donateUrl" maxlength="400"></div>
+          <label class="switch"><input type="checkbox" data-path="strips.news"><span></span>Strip berita</label>
+          <label class="switch"><input type="checkbox" data-path="strips.weather"><span></span>Cuaca</label>
+          <label class="switch"><input type="checkbox" data-path="strips.live"><span></span>Strip Live Shift</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="adm-sec" data-sec="menu" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Tab di header</span><h2>Menu program</h2></div>
+          <div class="field inline"><label for="f-defroute">Menu pembuka User</label><select id="f-defroute" data-path="defaultRoute"></select></div></div>
+        <p class="muted small">Ubah nama, ikon, judul, dan warna tiap menu. Matikan <b>Tampil</b> untuk menyembunyikannya dari User (Admin tetap melihatnya dengan tanda ⊘). Urutan di sini = urutan tab &amp; pintasan Alt+angka.</p>
+        <div class="tbl-wrap"><table class="tbl" id="routesTbl"><thead><tr><th>Urut</th><th>Tampil</th><th>Ikon</th><th>Nama tab</th><th>Judul halaman</th><th>Warna</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- WARNA -->
+    <section class="adm-sec" data-sec="colors" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Satu klik</span><h2>Preset tema</h2></div></div>
+        <div class="presets" id="presets"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Dipakai di kedua tema</span><h2>Warna aksen</h2></div><button type="button" class="btn sm" data-clear="colors.accents">Kembalikan bawaan</button></div>
+        <div class="cgrid" id="accentGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Permukaan &amp; teks</span><h2>Tema terang</h2></div><button type="button" class="btn sm" data-clear="colors.light">Kembalikan bawaan</button></div>
+        <div class="cgrid" id="lightGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Permukaan &amp; teks</span><h2>Tema gelap</h2></div><button type="button" class="btn sm" data-clear="colors.dark">Kembalikan bawaan</button></div>
+        <div class="cgrid" id="darkGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Tipografi</span><h2>Font &amp; sudut</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-font-b">Font isi</label><select id="f-font-b" data-path="colors.font.body"><option value="">Nunito (bawaan)</option><option value='"Inter"'>Inter*</option><option value='"Poppins"'>Poppins*</option><option value='system-ui'>Font sistem</option><option value='Georgia,serif'>Georgia (serif)</option><option value='"JetBrains Mono"'>JetBrains Mono</option></select></div>
+          <div class="field"><label for="f-font-d">Font judul</label><select id="f-font-d" data-path="colors.font.display"><option value="">Fredoka (bawaan)</option><option value='"Nunito"'>Nunito</option><option value='"Poppins"'>Poppins*</option><option value='system-ui'>Font sistem</option><option value='Georgia,serif'>Georgia (serif)</option><option value='"JetBrains Mono"'>JetBrains Mono</option></select></div>
+          <div class="field"><label for="f-radius">Sudut kartu</label><select id="f-radius" data-path="colors.radius"><option value="">8px (bawaan)</option><option value="0px">0px · tajam</option><option value="4px">4px</option><option value="14px">14px</option><option value="22px">22px · bulat</option></select></div>
+        </div>
+        <p class="muted small">* Font bertanda bintang perlu dimuat lewat CSS kustom, mis. <code>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap');</code> di Script &amp; CSS → Semua halaman.</p>
+      </div>
+    </section>
+
+    <!-- NAMA ELEMEN -->
+    <section class="adm-sec" data-sec="elements" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Ganti teks, label, placeholder</span><h2>Nama elemen</h2></div>
+          <span class="row-gap"><button type="button" class="btn sm primary" id="btnPick">⌖ Pilih elemen di preview</button><button type="button" class="btn sm" id="btnAddRule">+ Aturan kosong</button></span></div>
+        <p class="muted small">Klik <b>Pilih elemen di preview</b>, arahkan kursor ke elemen di preview kanan, lalu klik. Selector terisi otomatis — tinggal tulis nama baru. Aturan tetap berlaku walau halaman merender ulang. Target <b>Shell</b> = header, login, screensaver.</p>
+        <div class="tbl-wrap"><table class="tbl" id="rulesTbl"><thead><tr><th>Aktif</th><th>Halaman</th><th>Selector CSS</th><th>Ubah</th><th>Nilai baru</th><th></th></tr></thead><tbody></tbody></table></div>
+        <p class="empty" id="rulesEmpty">Belum ada aturan. Mulai dengan memilih elemen di preview.</p>
+      </div>
+    </section>
+
+    <!-- SCRIPT & CSS -->
+    <section class="adm-sec" data-sec="code" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Kode kustom</span><h2>Script &amp; CSS</h2></div>
+          <span class="row-gap">
+            <span class="seg" id="codeType"><button type="button" data-v="css" aria-pressed="true">CSS</button><button type="button" data-v="js" aria-pressed="false">JavaScript</button></span>
+            <div class="field inline"><label for="codeTarget">Target</label><select id="codeTarget"></select></div>
+          </span></div>
+        <div class="code-wrap"><div class="code-gutter" id="codeGutter" aria-hidden="true"></div><textarea id="codeArea" spellcheck="false" wrap="off" aria-label="Editor kode"></textarea></div>
+        <div class="code-foot">
+          <span class="muted small" id="codeHelp"></span>
+          <span class="row-gap"><select id="snippetSel" aria-label="Sisipkan contoh"><option value="">＋ Sisipkan contoh…</option></select><button type="button" class="btn sm" id="btnRunPreview">▶ Jalankan di preview</button></span>
+        </div>
+        <p class="code-err" id="codeErr" hidden></p>
+      </div>
+    </section>
+
+    <!-- CSV -->
+    <section class="adm-sec" data-sec="csv" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Menu CSV Maker · Clip Insertion</span><h2>Pengaturan CSV</h2></div><button type="button" class="btn sm" data-preview="csv">👁 Preview CSV Maker</button></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-csv-pref">Daftar awalan UID Output</label><input id="f-csv-pref" maxlength="80" placeholder="01, 02, 03"><span class="hint">Pisahkan dengan koma. Mode Advance mengenali awalan dari angka terakhir Source UID (mis. akhir 2 → awalan berakhiran 2).</span></div>
+          <div class="field"><label for="f-csv-mode">Mode pembuka</label><select id="f-csv-mode" data-path="csv.defaultMode"><option value="original">01 · Original</option><option value="advance">02 · Advance</option><option value="legacy">03 · Legacy</option></select><span class="hint">Dipakai bila User belum pernah memilih mode.</span></div>
+          <div class="field"><label for="f-csv-count">Jumlah klip awal</label><select id="f-csv-count" data-path="csv.defaultCount" data-type="int"></select></div>
+          <div class="field"><label for="f-csv-tc">Timecode awal SOM/EOM</label><input id="f-csv-tc" data-path="csv.defaultTc" maxlength="14" placeholder="00:00:00:00@25"><span class="hint" id="tcHint">Format hh:mm:ss:ff@25.</span></div>
+        </div>
+        <div class="field" style="margin-top:16px"><span class="label">Mode yang tersedia untuk User</span>
+          <div class="row-gap">
+            <label class="switch"><input type="checkbox" data-path="csv.modes.original"><span></span>01 Original</label>
+            <label class="switch"><input type="checkbox" data-path="csv.modes.advance"><span></span>02 Advance</label>
+            <label class="switch"><input type="checkbox" data-path="csv.modes.legacy"><span></span>03 Legacy</label>
+          </div>
+        </div>
+        <p class="muted small" style="margin-top:14px">Struktur CSV tetap 43 kolom (3 UID + 10 klip × 4), CRLF, UTF-8 tanpa BOM. Untuk mengganti teks/label di CSV Maker gunakan <b>Nama Elemen</b> dengan halaman <b>CSV Maker</b>.</p>
+      </div>
+    </section>
+
+
+    <!-- SCENE DECK -->
+    <section class="adm-sec" data-sec="scene" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Menu Scene Deck · laporan brand exposure</span><h2>Embed Type</h2></div><button type="button" class="btn sm" data-preview="scene">👁 Preview Scene Deck</button></div>
+        <p class="muted small">Matikan jenis yang tidak dipakai agar dropdown User lebih ringkas. Jenis yang dimatikan tetap sah untuk draft lama. <b>KEY LOGO</b> selalu tersedia karena dijumlahkan ke nilai KEY LOGO di slide 2.</p>
+        <div class="type-grid" id="sceneTypes"></div>
+        <div class="fgrid" style="margin-top:16px">
+          <div class="field"><label for="f-sc-extra">Embed Type tambahan (satu per baris)</label><textarea id="f-sc-extra" rows="4" maxlength="600" placeholder="mis. Signage LED Screen&#10;Uniform Placement"></textarea><span class="hint">Muncul di grup "Embed type" pada setiap scene.</span></div>
+          <div class="field"><label for="f-sc-def">Embed Type untuk scene baru</label><select id="f-sc-def"></select><span class="hint">Dipakai saat User menambah scene.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Pembaruan dari content-analyst-v3</span><h2>Fitur Scene Deck</h2></div></div>
+        <ul class="recs">
+          <li><i>✓</i><span><b>TCR satu baris</b> — "TCR IN : hh:mm:ss:ff   TCR OUT : hh:mm:ss:ff" dengan spasi tak-putus agar pasangan tidak terpotong.</span></li>
+          <li><i>✓</i><span><b>Embed Type baru</b> — 10 jenis signage/placement + KEY LOGO khusus; jenis lama (Poster Board, Stand Signage, Object Placement) tetap terbaca.</span></li>
+          <li><i>✓</i><span><b>Pratinjau seluruh slide</b> — cover, ringkasan, semua scene, penutup; tombol ‹ ›, panah keyboard, Home/End, daftar slide.</span></li>
+          <li><i>✓</i><span><b>Logo slide penutup</b> diambil dari template untuk pratinjau.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- KEAMANAN -->
+    <section class="adm-sec" data-sec="security" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Screensaver &amp; sign out</span><h2>Sesi</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-idle">Screensaver muncul setelah (detik)</label><input id="f-idle" type="number" min="10" max="3600" data-path="session.idleSec" data-type="int"></div>
+          <div class="field"><label for="f-uso">Sign out otomatis User (menit, 0 = mati)</label><input id="f-uso" type="number" min="0" max="1440" data-path="session.userSignoutMin" data-type="int"></div>
+          <div class="field"><label for="f-aso">Sign out otomatis Admin (menit, 0 = mati)</label><input id="f-aso" type="number" min="0" max="1440" data-path="session.adminSignoutMin" data-type="int"></div>
+          <label class="switch"><input type="checkbox" data-path="session.adminLockOnSaver"><span></span>Kunci sesi Admin saat screensaver (perlu private key)</label>
+          <label class="switch"><input type="checkbox" data-path="session.userLockOnSaver"><span></span>Kunci sesi User saat screensaver (perlu tanggal)</label>
+        </div>
+        <p class="muted small">Hitung mundur sign out tampil di screensaver. Sesi User juga berakhir otomatis saat tanggal berganti.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Percobaan salah</span><h2>Perlindungan login</h2></div></div>
+        <div class="fgrid">
+          <div class="field"><label for="f-max">Batas salah sebelum dikunci</label><input id="f-max" type="number" min="1" max="20" data-path="security.maxAttempts" data-type="int"></div>
+          <div class="field"><label for="f-lock">Lama penguncian (detik)</label><input id="f-lock" type="number" min="5" max="3600" data-path="security.lockSec" data-type="int"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Disimpan sebagai hash SHA-256</span><h2>Private key Admin</h2></div><span class="chip" id="keyState">Kunci bawaan</span></div>
+        <form class="fgrid" id="keyForm" autocomplete="off">
+          <div class="field"><label for="k-cur">Private key saat ini</label><input id="k-cur" type="password" autocomplete="off"></div>
+          <div class="field"><label for="k-new">Private key baru (min. 8 karakter)</label><input id="k-new" type="password" autocomplete="new-password"></div>
+          <div class="field"><label for="k-new2">Ulangi private key baru</label><input id="k-new2" type="password" autocomplete="new-password"></div>
+          <div class="row-gap span2"><button type="submit" class="btn sm primary">Ganti private key</button><button type="button" class="btn sm danger" id="btnKeyReset">Kembalikan ke kunci bawaan</button></div>
+          <p class="notice span2" id="keyMsg" hidden></p>
+        </form>
+        <p class="muted small">Kunci tidak pernah disimpan sebagai teks — hanya hash bergaram yang diregangkan 4096 putaran. Perubahan kunci berlaku di browser ini; sertakan lewat <em>site-config.js</em> untuk komputer lain.</p>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section class="adm-sec" data-sec="logs" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Login, salah kunci, sign out, simpan</span><h2>Log aktivitas</h2></div>
+          <span class="row-gap"><select id="logFilter" aria-label="Filter log"><option value="">Semua</option><option value="fail">Hanya gagal / peringatan</option><option value="login">Login &amp; sign out</option><option value="config">Perubahan konfigurasi</option></select>
+          <button type="button" class="btn sm" id="btnLogRefresh">⟳</button><button type="button" class="btn sm" id="btnLogCsv">⬇ CSV</button><button type="button" class="btn sm" id="btnGuardReset">Buka kunci form</button><button type="button" class="btn sm danger" id="btnLogClear">Hapus log</button></span></div>
+        <div class="guard-row" id="guardRow"></div>
+        <div class="tbl-wrap"><table class="tbl" id="logTbl"><thead><tr><th>Waktu</th><th>Peristiwa</th><th>Peran</th><th>Keterangan</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- CADANGAN -->
+    <section class="adm-sec" data-sec="backup" hidden>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Agar semua komputer sama</span><h2>Rilis konfigurasi</h2></div></div>
+        <ol class="howto">
+          <li>Simpan perubahan, lalu klik <b>Unduh site-config.js</b>.</li>
+          <li>Timpa file <code>js/data/site-config.js</code> di folder program dengan file tersebut.</li>
+          <li>Bagikan ulang folder/ZIP program. User di komputer mana pun akan melihat tampilan ini.</li>
+        </ol>
+        <div class="row-gap"><button type="button" class="btn primary" id="btnSiteFile">⬇ Unduh site-config.js</button><button type="button" class="btn" id="btnExportJson">⬇ Ekspor JSON</button><label class="btn" for="importFile">⬆ Impor JSON</label><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><span class="card-kicker">Otomatis setiap simpan</span><h2>Riwayat versi</h2></div><button type="button" class="btn sm danger" id="btnResetAll">Kembalikan semua ke bawaan</button></div>
+        <ul class="hist" id="histList"></ul>
+      </div>
+    </section>
+  </main>
+
+  <aside class="adm-preview" id="previewPane" aria-label="Preview">
+    <div class="pv-bar">
+      <b>PREVIEW</b>
+      <select id="pvRoute" aria-label="Halaman preview"></select>
+      <span class="seg" id="pvTheme"><button type="button" data-v="light" aria-pressed="false">☀</button><button type="button" data-v="dark" aria-pressed="false">☾</button></span>
+      <button type="button" class="btn sm" id="pvReload" title="Muat ulang preview">⟳</button>
+      <button type="button" class="btn sm" id="pvToggle" title="Perbesar / perkecil preview">⤢</button>
+    </div>
+    <div class="pv-frame"><iframe id="pvFrame" title="Preview tampilan User"></iframe><div class="pv-pick" id="pvPick" hidden>⌖ Mode pilih elemen — klik elemen di preview · Esc batal</div></div>
+    <p class="pv-note">Preview menampilkan <b>draft</b> — belum tersimpan sampai Anda klik <b>Simpan &amp; terapkan</b>.</p>
+  </aside>
+</div>
+</div>
+<div class="adm-toasts" id="admToasts" aria-live="polite"></div>
+<script src="../js/data/admin-roadmap.js"></script>
+<script src="../js/pages/admin.js"></script>
+</body>
+</html>

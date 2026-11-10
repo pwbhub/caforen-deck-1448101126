@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#11141A">
+<meta name="description" content="Content Analyst Draft — satu workspace untuk Shift Live, Timecode Decoder, Hotspot Studio, CSV Maker, dan Scene Deck.">
+<title>Content Analyst Draft</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='12' fill='%2311141A' stroke='%23C6F21B' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='%23C6F21B' stroke-width='5'/%3E%3Cpath d='M32 24v9l6 4' stroke='%23C6F21B' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<script>
+/* tema diterapkan sebelum render agar tidak berkedip */
+(function(){var t=null;try{t=localStorage.getItem('ca-theme')}catch(_){}if(!t){try{t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}catch(_){t='dark'}}document.documentElement.dataset.theme=t==='light'?'light':'dark'})();
+</script>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/gate.css">
+<link rel="stylesheet" href="css/saver.css">
+</head>
+<body class="shell is-locked">
+
+<header class="mh" id="masterHeader">
+  <div class="mh-top">
+    <a class="mh-brand" href="#home" data-go="home" aria-label="Content Analyst Draft — Beranda">
+      <span class="mh-logo" id="mhLogo" aria-hidden="true">◷</span>
+      <span class="mh-bt"><small id="mhKicker">WORKSPACE · DRAFT</small><strong id="mhName">CONTENT ANALYST</strong></span>
+    </a>
+
+    <nav class="mh-tabs" id="mhTabs" role="tablist" aria-label="Menu program"></nav>
+
+    <div class="mh-right">
+      <div class="mh-clock" aria-live="off"><b id="mhClock">--:--:--</b><small id="mhDate">Memuat tanggal…</small></div>
+      <a class="mh-link mh-wa" id="lnkCreator" href="https://wa.me/6285894925355?text=Halo%20Creator%20Content%20Analyst%20Draft%20%F0%9F%91%8B" target="_blank" rel="noopener" title="Chat Creator via WhatsApp · 085894925355" aria-label="Chat Creator via WhatsApp 085894925355">
+        <span class="ml-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.4 4.8 5-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9a8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 1 1 12 20.1Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.6a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg></span>
+        <span class="ml-text"><small>WA 0858-9492-5355</small><b id="lnkCreatorLabel">Creator</b></span>
+      </a>
+      <a class="mh-link mh-donate" id="lnkDonate" href="https://saweria.co/SAGELINE" target="_blank" rel="noopener" title="Dukung pengembangan via Saweria" aria-label="Donate melalui Saweria (tab baru)">
+        <span class="ml-ico" aria-hidden="true">♥</span>
+        <span class="ml-text"><small>Saweria</small><b id="lnkDonateLabel">Donate</b></span>
+      </a>
+      <button type="button" class="mh-theme" id="themeToggle" aria-label="Ganti tema" title="Ganti tema (Alt+T)">
+        <span class="mh-theme-knob" aria-hidden="true"></span>
+        <span class="mh-theme-ico sun" aria-hidden="true">☀</span>
+        <span class="mh-theme-ico moon" aria-hidden="true">☾</span>
+      </button>
+      <span class="mh-role" id="mhRole" data-role="user" title="Peran aktif"><i aria-hidden="true">●</i><b id="mhRoleText">USER</b></span>
+      <button type="button" class="mh-out" id="signOutBtn" title="Sign out (keluar)" aria-label="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg><span>Sign out</span></button>
+    </div>
+  </div>
+
+  <!-- Strip 1: berita memanjang + cuaca terselip -->
+  <div class="mh-strip mh-news" id="stripNews" aria-label="Berita dan cuaca">
+    <span class="strip-tag"><i class="pulse"></i><span>BERITA</span><small id="newsStatus" title="RSS diperbarui setiap 5 menit">Memuat…</small></span>
+    <div class="wx" id="weatherNow" role="region" aria-label="Cuaca terkini" data-state="loading">
+      <button type="button" class="wx-main" id="weatherToggle" aria-expanded="false" aria-controls="weatherPop" title="Detail cuaca">
+        <span class="wx-symbol" id="weatherSymbol" aria-hidden="true"></span>
+        <b class="wx-temp" id="weatherTemperature">--°</b>
+        <span class="wx-desc"><strong id="weatherSummary">Memuat cuaca</strong><small id="weatherLocationLabel">Jakarta Pusat</small></span>
+      </button>
+      <button type="button" class="wx-btn" id="weatherLocate" title="Gunakan lokasi perangkat" aria-label="Gunakan lokasi perangkat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button>
+      <button type="button" class="wx-btn" id="weatherRefresh" title="Perbarui cuaca" aria-label="Perbarui cuaca"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/></svg></button>
+    </div>
+    <div class="strip-view"><div class="track" id="newsTrack"><span class="strip-empty">Memuat berita terbaru…</span></div></div>
+  </div>
+
+  <!-- Strip 2: Live Shift seluruh departemen -->
+  <div class="mh-strip mh-live" id="stripLive" aria-label="Shift yang sedang berjalan di semua departemen">
+    <span class="strip-tag"><i class="pulse"></i><span>LIVE SHIFT</span><small id="liveStatus">Memuat…</small></span>
+    <div class="strip-view"><div class="track" id="liveTrack"><span class="strip-empty">Memuat jadwal semua departemen…</span></div></div>
+    <button type="button" class="strip-btn" id="liveRefresh" title="Sinkronkan jadwal" aria-label="Sinkronkan jadwal">↻</button>
+  </div>
+
+  <div class="mh-announce" id="announce" hidden role="status"><b id="announceTag">INFO</b><span id="announceText"></span><button type="button" id="announceClose" aria-label="Tutup pengumuman">✕</button></div>
+
+  <div class="wx-pop" id="weatherPop" hidden>
+    <div class="wx-pop-head"><b>Detail cuaca</b><button type="button" class="wx-btn" id="weatherClose" aria-label="Tutup detail cuaca">✕</button></div>
+    <p class="wx-status" id="weatherStatus" role="status" aria-live="polite">Mengambil data terbaru…</p>
+    <div class="wx-facts" id="weatherFacts"></div>
+    <p class="wx-note" id="weatherExplanation">Kondisi terkini dari model cuaca, bukan sensor langsung.</p>
+  </div>
+</header>
+
+<main class="stage" id="stage" aria-live="polite"></main>
+
+<!-- Layar terpadu: transisi antar menu + screensaver idle -->
+<div class="saver" id="saver" data-mode="idle" data-state="gate" data-anim="full" aria-hidden="true" role="status" aria-label="Content Analyst Draft">
+  <div class="saver-grid" aria-hidden="true"></div>
+  <div class="saver-shape s1" aria-hidden="true"></div>
+  <div class="saver-shape s2" aria-hidden="true"></div>
+  <div class="saver-shape s3" aria-hidden="true"></div>
+  <div class="saver-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="saver-ring r1" aria-hidden="true"></div><div class="saver-ring r2" aria-hidden="true"></div>
+  <div class="saver-scan" aria-hidden="true"></div>
+  <div class="saver-float" aria-hidden="true"><div class="saver-bounce" id="saverBounce"><i id="saverBounceIco">◷</i><b id="saverBounceText">IDLE</b></div></div>
+  <div class="saver-body">
+    <div class="saver-bigclock" aria-hidden="true"><b id="saverHH">--</b><i>:</i><b id="saverMM">--</b><small id="saverSS">--</small></div>
+    <p class="saver-kicker" id="saverKicker">CONTENT ANALYST · WORKSPACE</p>
+    <h2 class="saver-title"><span class="st-1" id="saverT1">CONTENT</span> <span class="st-2" id="saverT2">ANALYST</span> <span class="saver-draft" id="saverBadge">DRAFT</span></h2>
+    <div class="saver-loader" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="saver-bar" aria-hidden="true"><i></i></div>
+    <p class="saver-msg" id="saverMsg">Gerakkan kursor atau tekan tombol apa saja untuk kembali</p>
+    <div class="saver-timer" id="saverTimer" hidden><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="st-bg" cx="22" cy="22" r="19"/><circle class="st-fg" id="saverRing" cx="22" cy="22" r="19"/></svg><p class="saver-count" id="saverCount"></p></div>
+    <form class="saver-unlock" id="saverUnlock" hidden autocomplete="off">
+      <label for="unlockKey" id="unlockLabel">Sesi Admin terkunci — masukkan private key</label>
+      <div class="su-row"><input id="unlockKey" type="password" autocomplete="off" spellcheck="false" placeholder="Private key"><button type="submit" class="su-btn go">Buka</button></div>
+      <p class="su-warn" id="unlockWarn" role="alert" hidden></p>
+    </form>
+    <div class="saver-actions" id="saverActions" hidden>
+      <button type="button" class="su-btn go" id="saverResume">▶ Lanjutkan</button>
+      <button type="button" class="su-btn out" id="saverSignOut">⏻ Sign out</button>
+    </div>
+  </div>
+  <div class="saver-foot"><span id="saverClock">--:--</span><span id="saverMode">IDLE MODE</span></div>
+</div>
+
+<!-- Gerbang masuk: User (tanggal hari ini) / Admin (private key) -->
+<section class="gate" id="gate" aria-labelledby="gateTitle">
+  <div class="gate-grid" aria-hidden="true"></div>
+  <div class="gate-shape g1" aria-hidden="true"></div><div class="gate-shape g2" aria-hidden="true"></div><div class="gate-shape g3" aria-hidden="true"></div>
+  <div class="gate-card" id="gateCard">
+    <div class="gate-top">
+      <span class="gate-logo" id="gateLogo" aria-hidden="true">◷</span>
+      <div class="gate-bt"><small id="gateKicker">WORKSPACE · DRAFT</small><strong id="gateName">CONTENT ANALYST</strong></div>
+      <div class="gate-clock"><b id="gateClock">--:--:--</b><small id="gateDate">…</small></div>
+    </div>
+    <h1 id="gateTitle">Masuk Workspace</h1>
+    <p class="gate-sub" id="gateSub"></p>
+    <div class="gate-alert" id="gateAlert" role="alert" hidden><b>⚠ PERINGATAN</b><span id="gateAlertText"></span></div>
+    <div class="gate-tabs" role="tablist" aria-label="Pilih peran">
+      <button type="button" role="tab" id="tabUser" data-role="user" aria-selected="true" aria-controls="formUser"><i aria-hidden="true">☺</i><span>User</span><small>Tampilan siap pakai</small></button>
+      <button type="button" role="tab" id="tabAdmin" data-role="admin" aria-selected="false" aria-controls="formAdmin"><i aria-hidden="true">⚙</i><span>Admin</span><small>Ubah tampilan &amp; skrip</small></button>
+    </div>
+    <form class="gate-form" id="formUser" data-role="user" role="tabpanel" aria-labelledby="tabUser" autocomplete="off" novalidate>
+      <label for="userDate" id="userLabel">Tanggal hari ini</label>
+      <div class="gate-row">
+        <input id="userDate" inputmode="text" autocomplete="off" spellcheck="false" placeholder="DD-MM-YYYY" aria-describedby="userHint userWarn">
+        <button type="submit" class="gate-go">Masuk →</button>
+      </div>
+      <p class="gate-hint" id="userHint"></p>
+      <p class="gate-warn" id="userWarn" role="alert" hidden></p>
+    </form>
+    <form class="gate-form" id="formAdmin" data-role="admin" role="tabpanel" aria-labelledby="tabAdmin" autocomplete="off" novalidate hidden>
+      <label for="adminKey" id="adminLabel">Private key</label>
+      <div class="gate-row">
+        <div class="gate-pass"><input id="adminKey" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••••" aria-describedby="adminHint adminWarn"><button type="button" class="gate-eye" id="adminEye" aria-label="Tampilkan kunci" aria-pressed="false">👁</button></div>
+        <button type="submit" class="gate-go">Masuk →</button>
+      </div>
+      <p class="gate-hint" id="adminHint"></p>
+      <p class="gate-warn" id="adminWarn" role="alert" hidden></p>
+      <p class="gate-caps" id="adminCaps" hidden>⇪ Caps Lock aktif</p>
+    </form>
+    <p class="gate-foot" id="gateFoot"></p>
+  </div>
+</section>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/data/site-config.js"></script>
+<script src="js/core/sha256.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/apply.js"></script>
+<script src="js/data/m-color-snapshot.js"></script>
+<script src="js/data/weather-icons.js"></script>
+<script src="js/core/shift-core.js"></script>
+<script src="js/shell/ticker.js"></script>
+<script src="js/shell/news.js"></script>
+<script src="js/shell/weather.js"></script>
+<script src="js/shell/live-ticker.js"></script>
+<script src="js/shell/shell.js"></script>
+<script src="js/shell/gate.js"></script>
+</body>
+</html>
