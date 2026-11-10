@@ -11,6 +11,7 @@ function core(now,requests=[]){
     const callback=url.searchParams.get('tqx').split(':')[1];
     window[callback]({status:'ok',table:{rows:[]}});
   }}};
+  vm.runInNewContext(fs.readFileSync('js/data/m-color-snapshot.js','utf8'),{window});
   vm.runInNewContext(fs.readFileSync('js/core/shift-core.js','utf8'),{window,document,Date:Clock,Intl,setTimeout,clearTimeout});
   return window.CAShift;
 }
@@ -48,4 +49,23 @@ test('automatic selection advances when the month changes',async()=>{
 });
 test('manual tab selection is retained',async()=>{
   assert.equal((await selectMonth('OCT 26',11)).context.loadedMonth,'OCT 26');
+});
+
+// November source colors: Ardi/Wahid orange, Miko black on the 10th.
+function novemberRoster(){
+  return {'NOV 26':{'CONTENT ANALYST':['Ardi','Wahid','Miko'].map(name=>({name,days:Array.from({length:30},(_,i)=>i===9?'M':'L')}))}};
+}
+test('November M Sore appears at 16 WIB and remains separate from M Malam',()=>{
+  const shift=core('2026-11-10T09:00:00Z'), roster=novemberRoster();
+  const live=shift.liveSlots(roster,'CONTENT ANALYST',new Date('2026-11-10T09:00:00Z'));
+  assert.deepEqual(JSON.parse(JSON.stringify(live.map(s=>[s.id,s.members]))),[['M_SORE',['Ardi','Wahid']]]);
+  const next=shift.nextSlot(roster,'CONTENT ANALYST',new Date('2026-11-10T09:00:00Z'));
+  assert.equal(next.id,'M_MALAM');assert.equal(next.members.join(','),'Miko');
+});
+test('November M Sore continues after midnight and ends at 01 WIB',()=>{
+  const shift=core('2026-11-10T17:30:00Z'), roster=novemberRoster();
+  const ids=at=>Array.from(shift.liveSlots(roster,'CONTENT ANALYST',new Date(at)),s=>s.id).join(',');
+  assert.equal(ids('2026-11-10T08:59:59Z'),'');
+  assert.equal(ids('2026-11-10T17:30:00Z'),'M_SORE,M_MALAM');
+  assert.equal(ids('2026-11-10T18:00:00Z'),'M_MALAM');
 });

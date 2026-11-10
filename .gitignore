@@ -1,5 +1,8 @@
 .env
 data/
+!js/data/
+js/data/*
+!js/data/m-color-snapshot.js
 node_modules/
 .DS_Store
 *.log
