@@ -44,8 +44,9 @@
   }
   $('liveRefresh').addEventListener('click',function(e){e.currentTarget.blur();load()});
   $('liveTrack').addEventListener('click',function(e){var b=e.target.closest('[data-dept]');if(b&&root.CAShell)root.CAShell.navigate('shift',{dept:b.dataset.dept})});
-  load();setInterval(render,30000);setInterval(load,300000);
+  // Re-evaluate all overlapping work windows with the WIB clock, including 21:00.
+  load();setInterval(render,1000);setInterval(load,300000);
   root.addEventListener('online',load);
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){render();load()}});
   root.CALive={summary:function(){return rosters?summary():null},updatedAt:function(){return updatedAt},onUpdate:function(fn){listeners.push(fn)},reload:load};
 })(window);

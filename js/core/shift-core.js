@@ -15,7 +15,7 @@
     {id:'R_REGULER',key:'R',title:'Reguler',start:8,end:17,from:'08:00',to:'17:00',color:'#FFF3CD'},
     {id:'J_JANGKAR',key:'J',title:'Jangkar',start:12,end:21,from:'12:00',to:'21:00',color:'#FFFF00'},
     {id:'M_SORE',key:'M',title:'M Sore',start:16,end:25,from:'16:00',to:'01:00',color:'#F7B26A'},
-    {id:'M_MALAM',key:'M',title:'M Malam',start:21,end:30,from:'21:00',to:'06:00',color:'#2B2F38'}
+    {id:'M_MALAM',key:'M',title:'M Malam',start:21,end:30,from:'21:00',to:'06:00',color:'#000000'}
   ];
   var R10={id:'R10_PAGI',key:'R10',title:'R10 Pagi',start:10,end:19,from:'10:00',to:'19:00',color:'#FFF3CD'};
   var MONTH_ABBR=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -27,6 +27,13 @@
     var o={};parts.forEach(function(x){if(x.type!=='literal')o[x.type]=+x.value});return o;
   }
   function epochLocal(y,m,d,h){return Date.UTC(y,m-1,d,h)-7*3600000}
+  // Date.UTC accepts hours beyond 24, so overnight windows retain their assignment date.
+  function slotBounds(y,m,d,slot){return {start:epochLocal(y,m,d,slot.start),end:epochLocal(y,m,d,slot.end)}}
+  function isLiveSlot(slot,timestamp){
+    var begin=Number(slot&&(slot.workStart!=null?slot.workStart:slot.start));
+    var finish=Number(slot&&(slot.workEnd!=null?slot.workEnd:slot.end));
+    return !!slot&&Number.isFinite(begin)&&Number.isFinite(finish)&&timestamp>=begin&&timestamp<finish;
+  }
   function addDays(y,m,d,n){var x=new Date(Date.UTC(y,m-1,d));x.setUTCDate(x.getUTCDate()+n);return {y:x.getUTCFullYear(),m:x.getUTCMonth()+1,d:x.getUTCDate()}}
 
   function parseCSV(text){var rows=[],row=[],cell='',q=false;for(var i=0;i<text.length;i++){var c=text[i];if(c==='"'){if(q&&text[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===','&&!q){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(function(v){return v.trim()}))rows.push(row);row=[];cell=''}else cell+=c}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
@@ -91,9 +98,8 @@
     [-1,0].forEach(function(off){
       var day=addDays(p.year,p.month,p.day,off);
       shiftsFor(dept).forEach(function(s){
-        var start=epochLocal(day.y,day.m,day.d,s.start%24)+(s.start>=24?864e5:0);
-        var end=epochLocal(day.y,day.m,day.d,s.end%24)+(s.end>=24?864e5:0);
-        if(!(t>=start&&t<end))return;
+        var bounds=slotBounds(day.y,day.m,day.d,s),start=bounds.start,end=bounds.end;
+        if(!isLiveSlot(bounds,t))return;
         var a=s.id==='N_DINI'?addDays(day.y,day.m,day.d,-1):day;
         var tab=monthTab(a.y,a.m),roster=(rosters[tab]||{})[dept];if(!roster)return;
         var members=roster.filter(function(person){return codeMatches(resolvedCode(person,a.d,tab,dept),s)}).map(function(x){return x.name});
@@ -107,7 +113,7 @@
     [0,1].forEach(function(off){
       var day=addDays(p.year,p.month,p.day,off);
       shiftsFor(dept).forEach(function(s){
-        var start=epochLocal(day.y,day.m,day.d,s.start%24)+(s.start>=24?864e5:0);if(start<=t)return;
+        var start=slotBounds(day.y,day.m,day.d,s).start;if(start<=t)return;
         var a=s.id==='N_DINI'?addDays(day.y,day.m,day.d,-1):day;var tab=monthTab(a.y,a.m),roster=(rosters[tab]||{})[dept];if(!roster)return;
         var members=roster.filter(function(person){return codeMatches(resolvedCode(person,a.d,tab,dept),s)}).map(function(x){return x.name});
         if(members.length&&(!best||start<best.start))best={id:s.id,title:s.title,from:s.from,to:s.to,start:start,members:members};
@@ -131,5 +137,5 @@
       return rosters;
     });
   }
-  root.CAShift={SHEET:SHEET,DEPARTMENTS:DEPARTMENTS,DEPT_COLOR:DEPT_COLOR,shiftsFor:shiftsFor,monthTab:monthTab,jakartaParts:jakartaParts,parseCSV:parseCSV,parseRows:parseRows,jsonpSheet:jsonpSheet,gvizRows:gvizRows,liveSlots:liveSlots,nextSlot:nextSlot,loadAll:loadAll};
+  root.CAShift={SHEET:SHEET,DEPARTMENTS:DEPARTMENTS,DEPT_COLOR:DEPT_COLOR,shiftsFor:shiftsFor,slotBounds:slotBounds,isLiveSlot:isLiveSlot,resolvedCode:resolvedCode,codeMatches:codeMatches,monthTab:monthTab,jakartaParts:jakartaParts,parseCSV:parseCSV,parseRows:parseRows,jsonpSheet:jsonpSheet,gvizRows:gvizRows,liveSlots:liveSlots,nextSlot:nextSlot,loadAll:loadAll};
 })(window);
